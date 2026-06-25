@@ -1,0 +1,118 @@
+# ============================================================
+# ethioareb/.htaccess - CMS with Clean URLs
+# ============================================================
+
+Options -Indexes
+
+# Enable Rewrite Engine
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ============================================================
+# REMOVE .php EXTENSION
+# ============================================================
+
+# Redirect requests with .php to without .php
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,L]
+
+# Internally rewrite without .php to .php file
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*?)/?$ $1.php [L]
+
+# ============================================================
+# CMS ROUTES - All pages
+# ============================================================
+
+# Root - Login
+RewriteRule ^$ index.php [L]
+
+# Main Pages
+RewriteRule ^dashboard$ dashboard.php [L]
+RewriteRule ^services$ services.php [L]
+RewriteRule ^team$ team.php [L]
+RewriteRule ^gallery$ gallery.php [L]
+RewriteRule ^testimonials$ testimonials.php [L]
+RewriteRule ^blog$ blog.php [L]
+RewriteRule ^contact$ contact.php [L]
+RewriteRule ^applications$ applications.php [L]
+RewriteRule ^settings$ system_settings.php [L]
+RewriteRule ^logout$ logout.php [L]
+
+# ============================================================
+# PROTECT SENSITIVE FILES
+# ============================================================
+
+<FilesMatch "^(config|database|settings|auth)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ============================================================
+# SECURITY HEADERS
+# ============================================================
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "no-referrer-when-downgrade"
+</IfModule>
+
+# ============================================================
+# PREVENT DIRECTORY LISTING
+# ============================================================
+
+Options -Indexes
+
+# ============================================================
+# PROTECT INCLUDES AND ASSETS
+# ============================================================
+
+<Directory "includes">
+    Order allow,deny
+    Deny from all
+</Directory>
+
+<Directory "assets">
+    Options -Indexes
+</Directory>
+
+# ============================================================
+# PHP SETTINGS
+# ============================================================
+
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 20M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 20M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# ============================================================
+# ERROR PAGES
+# ============================================================
+
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+ErrorDocument 500 /500.php
+
+# ============================================================
+# END OF .htaccess
+# ============================================================
